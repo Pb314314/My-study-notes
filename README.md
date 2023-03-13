@@ -1,1 +1,1 @@
-## This master branch contains all the notes I made about programming and Leetcode.
+## The master branch contains all the notes I made about programming and Leetcode.
