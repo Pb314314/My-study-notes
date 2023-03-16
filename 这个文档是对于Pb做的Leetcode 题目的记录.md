@@ -891,6 +891,90 @@ public:
 
 
 
+### 题号:剑指Offer 07 日期:2023/3/16
+
+> ***网址：***[剑指 Offer 07. 重建二叉树 - 力扣（LeetCode）](https://leetcode.cn/problems/zhong-jian-er-cha-shu-lcof/)
+>
+> **难度：**中等
+>
+> **思想概括：**谔谔，这道题做了挺久的，算是对于前序遍历和中序遍历有了更深的理解吧。中序遍历的左侧和右侧分别就是root节点的左子树和右子树的所有元素。只有中序遍历只能知道左侧和右侧的节点有哪些和节点的个数，但不能确定节点的顺序（确定不了左右子树的根节点）。通过前序遍历，和中序遍历提供的根节点信息可以找到左右子树的根。就可以再通过递归来确定所有的左右连接。
+>
+> 前序遍历：
+>
+> * 提供了根节点的值。可以通过中序遍历提供的信息找到左右子树的前序遍历。
+>
+> 中序遍历：
+>
+> * 提供了左右子树的个数。
+>
+> **数据结构和算法：**树的遍历。
+
+#### ==代码实现== :happy:
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    unordered_map<int, int> value_index;
+    TreeNode* get_tree(const vector<int>& preorder, const vector<int>& inorder, int in_left, int in_right, int pre_left, int pre_right){
+        TreeNode* root = new(TreeNode);//new括号里是数据类型，生成的是指向数据结构的指针，不用加*
+        root->val = preorder[pre_left];
+        //cout<<"in_left:"<< in_left <<" "<< preorder[in_left] <<endl;
+        int inorder_index = value_index[root->val];
+        int left_l = inorder_index - in_left;
+        int right_l = in_right - inorder_index;
+        //cout<< left_l <<" "<< right_l <<endl;
+        if(left_l){
+            //计算inorder和preorder中左右子树的左右index
+            //inorder_left = inorder_index-left_l在root左边
+            //inorder_right = inorder_index - 1
+            //preorder_left = pre_left+1在root右边
+            //preorder_right = pre_left+left_l
+            root->left = get_tree(preorder, inorder, inorder_index-left_l, inorder_index-1,pre_left+1,pre_left+left_l);
+        }
+        if(right_l){
+            root->right = get_tree(preorder, inorder, inorder_index+1, inorder_index+right_l,pre_left+left_l+1,pre_left+left_l+right_l);
+        }
+        return root;
+    }
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        //这道题一开始没有想到应该怎么做。preorder的第一个可以得到根。
+        //通过preorder找到root的值。通过inorder找到root确定left和right的长度。
+        if(!preorder.size())return nullptr;
+        for(int i=0;i<inorder.size();i++){
+            value_index[inorder[i]] = i;
+        }
+        TreeNode* result = get_tree(preorder, inorder, 0, inorder.size()-1,0,preorder.size()-1);
+        return result;
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 由于原函数的输入值不好修改就再写一个递归函数，定义需要的输入值，在原函数中调用。
+
+* 我经常想使用void的递归函数，这样就不用处理返回值。这道题可以思考一下树递归中返回值的使用。
+
+#### 难点回顾:sagittarius:
+
+```text
+树的递归。
+前序遍历和中序遍历的信息使用。
+```
+
+
+
+
+
 
 
 

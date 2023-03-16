@@ -1,5 +1,46 @@
 # 这个文档是对于git使用的一些整理
 
+
+
+## git 版本回退：
+
+*参考网址：*[(9条消息) git进行版本回退（文件恢复、恢复误提交、已提交）_git回退提交_木鸟飞的博客-CSDN博客](https://blog.csdn.net/qing040513/article/details/109150075)
+
+2.git的4个区
+在介绍如何进行git版本回退前，我们需要先了解下git中的4个区：
+
+* 工作区（Working Area） 就相当于我们的工作空间的目录，我们代码本地存放的地方。
+* 暂存区（Stage）也称作Index，用来跟踪已暂存的文件，一般是存在.git下的index文件，所以有时也称暂存区为索引。
+* 本地仓库（Local Repository）
+* 远程仓库（Remote Repository）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+`git reset`
+
+
+
+
+
+
+
+
+
+
+
 ## gitignore
 
 今天在文件夹里面写了一天的记录，不想上传到github上，所以想着，就写一个git ignore文件来忽略掉我private的文件夹吧。自己vim随便写了一下，结果文件没有被忽略，还是被传上去了。谔谔，这里整理一下，gitignore文件应该怎么写。
@@ -70,4 +111,6 @@
 	
 	```
 
-	
+
+
+
