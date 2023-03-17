@@ -54,7 +54,7 @@ while(1){
     //n = recv(connect_fd, buff, MAXLINE, 0);
     //向客户端发送回应数据
 
-    if(!fork()){ //fork=0,如果是自进程，进入
+    if(!fork()){ //fork=0,如果是子进程，进入
         //对于fork可以再多理解一下。 当fork运行就会出现一个新的自进程。对于原来的父进程fork return子进程的id；对于子进程fork会return0；
         //我倒是可以让所有的自进程进入这里的一个函数进行首发操作
         std::cout<< "Another CLients!" <<std::endl;
