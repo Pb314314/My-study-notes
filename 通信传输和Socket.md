@@ -1,6 +1,6 @@
 # 这个文件整理一下通信协议和Socket编程：
 
-*参考网址：*https://blog.csdn.net/weixin_46120107/article/details/126528923
+*参考网址：*[(10条消息) C++项目实战-socket编程_c++ socket_陈达书的博客-CSDN博客](https://blog.csdn.net/weixin_46120107/article/details/126528923)
 
 ## socket 套接字概念：
 
