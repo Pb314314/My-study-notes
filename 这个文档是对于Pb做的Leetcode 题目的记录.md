@@ -891,7 +891,7 @@ public:
 
 
 
-### 题号:剑指Offer 07 日期:2023/3/16
+### 题号:剑指Offer 07 重建二叉树  日期:2023/3/16
 
 > ***网址：***[剑指 Offer 07. 重建二叉树 - 力扣（LeetCode）](https://leetcode.cn/problems/zhong-jian-er-cha-shu-lcof/)
 >
@@ -969,6 +969,73 @@ public:
 ```text
 树的递归。
 前序遍历和中序遍历的信息使用。
+```
+
+
+
+### 题号: 剑指Offer 33 二叉树的后序遍历序列 日期:2023/3/20
+
+> ***网址：***[剑指 Offer 33. 二叉搜索树的后序遍历序列 - 力扣（LeetCode）](https://leetcode.cn/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/)
+>
+> **难度：**中等
+>
+> **思想概括：** 这道题和上次的重建二叉树有一点像，上次是通过前序遍历和中序遍历来重建一棵二叉树。前序遍历时，第一个是根节点 ，后面是左子树和右子树；中序遍历时，前面时左子树信息，中间是根，然后是右子树信息。而后序遍历，最后是根节点信息，前面分别是左右子树信息。只需要找到从右往左第一个小于根节点的下标index，就找到了左子树。
+>
+> **数据结构和算法：** 树的遍历，我觉得更重要的是vector的访问，要对于overflow有预防性。写代码时对于变量的初值思考。
+
+![Picture1.png](pictures/4a2780853b72a0553194773ff65c8c81ddcc4ee5d818cb3528d5f8dd5fa3b6d8-Picture1.png)
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+    bool verifyPostorder(vector<int>& postorder) {
+        return check_Postorder(postorder, 0, postorder.size()-1);
+    }
+    bool check_Postorder(vector<int>& postorder, int left_id,int right_id){
+        //left_id是子vector的左边index， right_id是vector右边的id
+        if(left_id >= right_id) return true;
+        int root = postorder[right_id];
+        int ptr = right_id-1;
+        int left_ptr = left_id-1;//left_ptr的初值在最左侧的id再往左，因为如果不进入line16的if，就没有左子树
+        //！！！对于vector下标寻址的时候一定要判断index是否合理！！！
+        while(ptr>=left_id && postorder[ptr]>root){
+            ptr--;
+        }
+        
+        if(ptr>=left_id){
+            left_ptr = ptr;
+            //左侧的应该全部小于root
+            while(ptr>=left_id){
+                if(postorder[ptr]>root){
+                    //cout<< "Fail when root is:"<< root <<" "<<postorder[ptr]<<"<"<<root <<endl;
+                    return false;
+                }
+                ptr--;
+            }
+        //这个大的符合
+        }
+        //cout<< "root: "<<root;
+        //cout<< "左子树："<<postorder[left_id] <<"-"<<postorder[left_ptr]<<endl;
+        //cout<< "右子树:"<<postorder[left_ptr+1] <<"-"<<postorder[right_id-1]<<endl;
+        if(!check_Postorder(postorder, left_id, left_ptr)) return false;
+        if(!check_Postorder(postorder, left_ptr+1, right_id-1)) return false;
+        return true;
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 对于树的后序遍历的数值排列的理解。
+* vector下标访问之前一定要判断下标是否越界！！！要有提前预判报错的意识！！！
+
+#### 难点回顾:sagittarius:
+
+```text
+寻找左子树和右子树。二叉搜索树中左子树必须要全部小于根节点，右子树必须要全部大于根节点。以此来进行判断。
+划分出左右子树，根据左右的index递归判断。
 ```
 
 
