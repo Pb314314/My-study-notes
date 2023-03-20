@@ -1521,6 +1521,92 @@ int aint = (int) a-48;//-48把ASCII转化成数字
 
 
 
+### 题号: 剑指Offer 16 数值的整数次方 日期:2023/3/20
+
+> ***网址：[剑指 Offer 16. 数值的整数次方 - 力扣（LeetCode）](https://leetcode.cn/problems/shu-zhi-de-zheng-shu-ci-fang-lcof/)***
+>
+> **难度：**中等
+>
+> **思想概括：** 在C++中计算数值的阶乘。最简单的方法求n次方，当然是直接循环n次，但是这样的复杂度是O(n)。使用这道题目的方法：快速幂，可以将复杂度下降到*O*(*log*2*n*)。
+>
+> **数据结构和算法：**快速幂，补码，将int转化为long要构建新的函数，位右移除以二。
+>
+> 将次方数n分解为二进制，在底数上相当于逐渐平方，然后根据二进制为1还是0看要不要乘。
+
+![Picture1.png](pictures/40a7a874523e26cacae9c502a6e8cf8b58dba878739f17e6bb3ed6be76e97569-Picture1.png)
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+    double myPow(double x, int n) {
+        /*
+        double result = 1;
+        if(n>0){
+            while(n>0){
+                result = result*x;
+                n--;
+            }
+        }
+        else{
+            double multi = 1/x;
+            while(n<0){
+                result = result*multi;
+                n++;
+            }
+        }
+        return result;
+        //这是最simple的写法，但是时间复杂度是O(n)太慢了
+        */
+        //使用n二进制，看位是否为1，并且对于x进行平方 
+        if(x == 1) return 1;
+        long new_n = n;
+        if(new_n<0){
+        //将正数n和负数n都给转换为正数n
+        //注意：代码中 int32 变量n∈[−2147483648,2147483647]
+        //因此当 n = -2147483648 时执行 n = -n 会因越界而赋值出错 补码 负的多一个数字
+        //我们此处一开始就把 n 用 long 存储
+            x = 1/x;
+            new_n = -new_n;
+        }
+        return cal_Pow(x,new_n);
+    }
+    //数据类型不要搞错了！！ 把n变成long就需要一个新的函数来接收long类型的变量。
+    double cal_Pow(double x, long n){
+        double result = 1;
+        while(n){
+            if(n&1){
+                //最后一位是1
+                result *=x;
+            }
+            //cout<< x <<endl;
+            x = x*x;
+            n = n>>1;//右移一位
+            //cout<< n <<endl;
+        }
+        return result;
+    }
+};
+
+```
+
+#### 知识点整理:up:
+
+* int是带符号的，uint是不带符号的。默认**int占用四个字节**，也就是32位。int32_t是32位的，第一位是符号位，int32 变量n∈[−2147483648,2147483647]。**unsigned_int**不需要符号位，和int所能够表示的数字个数是一样的：[0,4294967295]。
+* char只占一个字节也就是8位。在ASCII中，定义的字符码值只有0-127。从本质来讲，字符'a','b'对应的就是二进制整数。刚刚查资料看到，char分为三种： char, signed_char, unsigned_char；
+* 别的一下数据的占用空间大小：Long long: 8bits. double: 8bits. 
+
+#### 难点回顾:sagittarius:
+
+```text
+对于幂运算降低运算的复杂度。使用位运算来确定二进制位，使用右移来逐位运算。
+```
+
+
+
+
+
 
 
 
