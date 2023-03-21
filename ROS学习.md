@@ -66,6 +66,12 @@ $ rostopic pub topic_name message_name
 $ rostopic pub /turtle1/cmd_vel geometry_msgs/Twist
 ```
 
+![image-20230321192459199](pictures/image-20230321192459199.png)
+
+这张照片就是第一个控制乌龟的概念图：
+
+两个Nodes。teleop_turtle收到stdin的键盘cmd信息。publish收到的信息，将message发送给topic /turtle1/cmd_vel。第二个node /turtlesim subscribe这个topic，获取cmd的信息的更新，操纵乌龟运动。
+
 **Start ROS:**
 
 ```shell
