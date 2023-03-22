@@ -1496,7 +1496,7 @@ ___
 
 ## 位运算
 
-### 题号: 剑指Offer 16 数值的整数次方 日期:2023/3/20
+### 题号: 剑指Offer 16 数值的整数次方 2023/3/20
 
 > ***网址：[剑指 Offer 16. 数值的整数次方 - 力扣（LeetCode）](https://leetcode.cn/problems/shu-zhi-de-zheng-shu-ci-fang-lcof/)***
 >
@@ -1601,9 +1601,13 @@ i = i << 9;
 
 **有符号右移：**
 
+符号是：>>
+
 向右移动之后，左侧空缺部分：正数补0，负数补1；也就是算数右移。
 
 **无符号右移：**
+
+==符号是： >>>三个表示无符号右移==，也就是左边补充0
 
 高位直接补0；
 
@@ -1624,7 +1628,7 @@ i = i << 9;
 
 
 
-### 题号: 剑指Offer 65 不用加减乘除做加法 日期:2023/3/21
+### 题号: 剑指Offer 65 不用加减乘除做加法 2023/3/21
 
 > ***网址：***[剑指 Offer 65. 不用加减乘除做加法 - 力扣（LeetCode）](https://leetcode.cn/problems/bu-yong-jia-jian-cheng-chu-zuo-jia-fa-lcof/)
 >
@@ -1672,6 +1676,224 @@ public:
 ```text
 位运算，异或，加法器。
 ```
+
+### 题号: 剑指Offer 56-1 数组中数字出现的次数 （2023/3/22）
+
+> ***网址：***[剑指 Offer 56 - I. 数组中数字出现的次数 - 力扣（LeetCode）](https://leetcode.cn/problems/shu-zu-zhong-shu-zi-chu-xian-de-ci-shu-lcof/)
+>
+> **难度：**中等
+>
+> **思想概括：**这个题目的做法之前从来没有遇到过！总结来说是异或运算的实战使用！这个中等题是由一个简单题进化而来的：这里这一下这个简单题：
+
+```text
+简单题：给你一个非空整数数组 nums ，除了某个元素只出现一次以外，其余每个元素均出现两次。
+找出那个只出现了一次的元素。
+你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。
+```
+
+```c++
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        //除了某个元素只出现一次以外 别的元素都出现两次
+        //使用异或运算来过滤掉出现两次的元素,并且异或运算有交换率,前后顺序是不影响的
+        int result = 0;
+        for(int i=0; i<nums.size();i++){
+            result = result^nums[i];
+        }
+        return result;
+    }
+};
+```
+
+这个解法是使用了异或运算的特性！
+
+**XOR的特性：**
+
+* **一个值与自身的运算，总是为 false。** 
+
+	`x^x =0`
+
+* **一个值与0的运算，总是等于本身。**
+
+​	`x^0 = x`
+
+* **异或具有可交换性**
+
+	`x^y = y^x`
+
+* **结合性**
+
+​	`x^(y^z) = (x^y)^z`
+
+> **数据结构和算法：** 上面这道题目是只有一个数出现一次，别的都出现两次，所以使用XOR可以过滤掉出现两次的数字。
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+    vector<int> singleNumbers(vector<int>& nums) {
+        /*
+        //这个是我愚蠢的排序,不符合要求的,因为排序本身就超过时间复杂度了.
+        //O(1)的空间复杂度就是只能使用常数空间,只储存变量参数之类的
+        sort(nums.begin(),nums.end());
+        for(int i=0;i<nums.size();i++){
+            int current = nums[i];
+            if((i+1)<=(nums.size()-1) && nums[i] == nums[i+1]){
+                nums.erase(nums.begin()+i);
+                nums.erase(nums.begin()+i);
+                i--;
+            }
+        }
+        return nums;
+        */
+        //使用异或运算,来过滤掉重复的数据
+        int xo_result = 0;//两个出现一次的数字的XOR结果
+        for(int i=0;i<nums.size();i++){
+            xo_result = xo_result^nums[i];
+        }
+        //找一位为1的 这一位 那两个数字的二进制位不一样
+        int mask = 1;
+        while(!(mask&xo_result)){
+            mask = mask<<1;//将mask左移一位
+        }//通过移动mask来寻找这个XOR结果的右侧第一个为1的位。
+        //找到从右往左的第一位1
+        int num1 = 0;
+        int num2 = 0;
+        for(int i=0;i<nums.size();i++){
+            if(nums[i]&mask){
+                num1 = num1^nums[i];
+            }
+            else{
+                num2 = num2^nums[i];
+            }
+        }
+        vector<int> result = {num1,num2};
+        return result;
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 使用异或来过滤重复的数字。（成对出现的数字，异或在一起为0）
+* 通过左移mask来寻找一个数字为一的位。（也可以通过左移mask来找到所有为1的位）
+
+#### 难点回顾:sagittarius:
+
+```text
+使用XOR来过滤掉成双出现的数字。在这道题中，只出现一次的数字只有两个，所以通过找一位他们XOR结果为一的位
+来将数字分为两组，分别XOR找到两个数字。
+下一题是重复数数字没有出现两遍的情况。
+```
+
+
+
+### 题号:剑指Offer 56 -2 数组中数字出现的个数 2 （2023/3/22）
+
+> ***网址：***[剑指 Offer 56 - II. 数组中数字出现的次数 II - 力扣（LeetCode）](https://leetcode.cn/problems/shu-zu-zhong-shu-zi-chu-xian-de-ci-shu-ii-lcof/)
+>
+> **难度：**中等
+>
+> **思想概括：**这个题目数字出现了三次，那就不能直接使用异或来消除了，
+>
+> **数据结构和算法：**异或的使用，真值表求逻辑表达式。
+>
+> ![Picture1.png](pictures/28f2379be5beccb877c8f1586d8673a256594e0fc45422b03773b8d4c8418825-Picture1.png)
+
+这个题目别的数字都出现三次。只有一个数字出现一次。所以别的数字的每一位要么有3个1，要么有三个0。三个0的情况不用考虑，三个1的情况就要将1求余数。为了能够记录实现每一位的数字到3返回0，使用为二进制位计算逻辑值：
+
+00->01->10三个状态，根据进来的位是1或者0进行转化。
+
+![Picture3.png](pictures/0a7ea5bca055b095673620d8bb4c98ef6c610a22f999294ed11ae35d43621e93-Picture3.png)
+
+![Picture4.png](pictures/f75d89219ad93c69757b187c64784b4c7a57dce7911884fe82f14073d654d32f-Picture4.png)
+
+#### ==代码实现== :happy:
+
+```c++
+#define S2
+#ifdef S1
+/*  
+            ab    ab    ab    ab
+    状态机: 00 -> 01 -> 10 -> 00
+    真值表:
+    c   b   a   b'
+    0   0   1   0
+    0   0   0   0
+    0   1   1   0
+    0   1   0   1
+    1   0   1   0
+    1   0   0   1
+    1   1   1   0
+    1   1   0   0
+    取结果为1的情况：b' = ~ab~c + ~a~bc = ~a(b~c+~bc) = ~a(b^c)
+    因此，可以推出: b = b ^ c & ~a
+
+    在更新b之后：
+            ab    ab    ab    ab
+    状态机: 01 -> 00 -> 10 -> 01
+    调换ab: ba    ba    ba    ba
+    状态机: 10 -> 00 -> 01 -> 10
+    与上述一致，因此，可以推出：a = a ^ c & ~b
+
+*/
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int a = 0, b = 0;
+        for (int c: nums) {
+            b = b ^ c & ~a;
+            a = a ^ c & ~b;
+        }
+        return b;
+    }
+};
+#else
+/*
+    用一个数组统计1的数目
+
+*/
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        vector<int> bits_num(32, 0);
+        const int m = 3;
+        for (int num: nums) {
+            int index = 0;
+            while (num > 1) {
+                bits_num[index++] += num & 1;
+                num = num/2;
+            }
+            bits_num[index] += num & 1;
+        }
+        int b = 0, res = 0;
+        for (int bit: bits_num) {
+            bit = bit % 3;
+            res |= bit<<b;
+            ++b;
+        }
+        return res;
+    }
+};
+#endif
+```
+
+#### 知识点整理:up:
+
+* 这道题我觉得太麻烦了，就没有自己实现，这个是复制的代码。
+* 使用真值表 计算每一位的状态变化，这个方法倒是很新颖，也不容易想到。
+
+#### 难点回顾:sagittarius:
+
+```text
+异或运算的使用。真值表。
+```
+
+
+
+
 
 
 
