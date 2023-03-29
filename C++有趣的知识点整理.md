@@ -1,5 +1,7 @@
 # 这个文档是C++有趣的知识点整理
 
+[toc]
+
 **一般是一些我在刷题的时候遇到的不太理解的代码和写法用法的一些整理。希望能记录下来让自己能更加理解代码的运行!!**🐱
 
 ## 函数指针和函数对象
@@ -465,18 +467,115 @@ cout << *(double*)pv << endl;   // 3.14
 
 * void指针可以通过NULL，或者nullptr进行初始化，表示空指针。
 * 当void指针作为函数的输入和输出时，表示可以接受任意类型的输入指针和输出任意类型的指针。（例如malloc函数的return void*，也就是可以为任意数据类型创建空间）
+* 
+
+## 函数括号后的const修饰：
+
+*参考链接：https://blog.csdn.net/Gorgeous_mj/article/details/90574796*
+
+**1. Const 加载函数前后的作用：**
+
+* 加在函数前：返回值是const
+* 后面加const便是函数不可以修改class的成员
+
+**注意：**在函数后加const修饰，根本是修饰this指针，使函数不能改变类的成员变量的值。成员变量是read-only.
+
+**又要注意！！：**函数后面的const修饰与static是不能同时出现的！！！ 也就是说函数后const和static不能同时修饰成员函数！！原因是static函数在类实例前生成，没有this函数！！当然也就不能用函数后const修饰了。
+
+**2、const与mutable的区别**
+从字面意思知道，mutalbe是“可变的，易变的”，跟constant（既C++中的const）是反义词。在C++中，mutable也是为了突破const的限制而设置的。被mutable修饰的变量（成员变量）将永远处于可变的状态，即使在一个const函数中。因此，后const成员函数中可以改变类的mutable类型的成员变量。
+
+```c++
+#include <iostream>
+using namespace std;
+
+class A{
+private:
+	int m_a;//int前加mutable关键字修饰即可编译通过
+public:
+	A():m_a(0){}
+	int setA(int a) const
+	{
+		this->m_a = a;//error: l-value specifies const object
+	}
+//	mutable修饰为了突破const的限制，如果在m_a加mutable修饰，可以在const函数中修改！！
+	int setA(int a)
+	{
+		this->m_a = a;
+	}
+};
+
+int main()
+{
+	A a1;
+	
+	return 0;
+}
+
+```
+
+**3、const成员函数与const对象**
+
+const成员函数还有另外一项作用，即常量对象相关。对于内置的数据类型，我们可以定义它们的常量，对用户自定义的类类型也是一样，可以定义它们的常量对象。有如下规则：
+①、const对象只能调用后const成员函数！！！；
+
+②、非const对象既可以调用const成员函数，又可以调用非const成员函数。
+
+```c++
+#include <iostream>
+using namespace std;
+
+class A{
+private:
+	int m_a;
+public:
+	A():m_a(0){}
+	int getA() const
+	{
+		return m_a;
+	}
+	int GetA() //非const成员函数，若在后面加上const修饰则编译通过
+	{
+		return m_a;
+	}
+	int setA(int a)
+	{
+		this->m_a = a;
+	}
+};
+
+int main()
+{
+	const A a2;//const对象
+	int t;
+	t = a2.getA();
+	t = a2.GetA();//error:const object call non-const member function,only non-const object can call
+
+
+	return 0;
+}
+
+```
 
 
 
+## 构造函数体内初始化与列表初始化的区别：
 
+*参考链接：[(11条消息) C++构造函数体内初始化与列表初始化的区别_列表初始化和在函数体初始化的区别_西塔666的博客-CSDN博客](https://blog.csdn.net/weixin_41675170/article/details/93485655)*
 
+大概意思是：
 
+*  调用函数内等号赋值：调用的是赋值运算符赋值函数（等号的重载）
 
+* 调用初始化列表语法直接调用复制构造函数。
 
+**为了标准化，建议使用列表初始化！！注意：初始化列表的初始化顺序是按照变量的声明顺序的，并不是按照初始化列表里写的顺序！**
 
+在类的继承中也要使用列表初始化（调用base class的构造函数）来给base class的private member赋值（衍生类不能自己给base class的private赋值）（C++ primer plus 395页）
 
+谔谔 当然如果你不给base class的值赋值，只给衍生类赋值，编译器会自己帮你赋值。。
 
-
+**！我太懒了呵呵，下次遇到再整理吧：）！**
 
 
 
