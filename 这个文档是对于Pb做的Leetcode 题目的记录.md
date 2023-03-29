@@ -535,6 +535,71 @@ int main(){
 
 
 
+### 题号：剑指Offer66. 构建乘积数组
+
+> ***网址：[剑指 Offer 66. 构建乘积数组 - 力扣（LeetCode）](https://leetcode.cn/problems/gou-jian-cheng-ji-shu-zu-lcof/)***
+>
+> **难度：**中等
+>
+> **思想概括：**这个道题如果可以用除法就很简单。因为不能用除法，就要维护数左右两侧的乘积。
+>
+> **数据结构和算法：**动态规划记录左右两侧的需要的值。感觉这道题其实不难，难的是想到用左右分别乘法起来。
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+    vector<int> constructArr(vector<int>& a) {
+        //这道题要是可以用除法，其实很简答，但是不能用除法！
+        //方法是维护某一个index左侧和右侧的数的乘积，用左侧和右侧的乘积来计算当前的积
+        //江湖上还流传着一种只需要一次遍历的传言...
+        int l = a.size();
+        vector<int> answer(l,1);
+        //对vector的构造函数不是很熟， 如果这里是0，则使用memset，复杂度为O(1)。如果为1，则要一位位赋值，为O(N)。
+        if(!l) return answer;
+        int left_mem = 1;//为了记录下面写法中的left[i] = left[i-1]*a[i-1];和right[l-1-i] = right[l-i]*a[l-i];
+        int right_mem = 1;//因为只需要上一个积和上一个值
+        for(int i=1;i<l;i++){//第一个不用做
+            left_mem = left_mem*a[i-1];
+            right_mem = right_mem*a[l-i];
+            answer[i] *= left_mem;
+            answer[l-i-1] *= right_mem;
+        }
+        return answer;
+        /*
+        //我一开始自己写的维护左右积的写法。
+        int l = a.size();
+        vector<int> answer(l);//对vector的构造函数不是很熟
+        if(!l) return answer;
+        vector<int> left(l);
+        left[0] = 1;
+        vector<int> right(l);
+        right[l-1] = 1;
+        for(int i=1;i<l;i++){//第一个不用做
+            left[i] = left[i-1]*a[i-1];
+            right[l-1-i] = right[l-i]*a[l-i];
+        }
+        for(int i=0;i<l;i++){//第一个不用做
+            answer[i] = left[i]*right[i];
+        }
+        return answer;
+        */
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 其实比较容易写出我自己写的，做两次循环，维护左右乘积的两个vector，然后用vector做乘法。
+* 可以记录一下vector的构造函数。`vector<int> left(l,1);`第一个参数是长度，第二个参数是数值。如果数值是0，则为O(1),若数值为1则为O(N).
+
+#### 难点回顾:sagittarius:
+
+```text
+想到将除自己之外的数的乘积转化为左右乘积就好做了🤭！
+```
+
 
 
 
