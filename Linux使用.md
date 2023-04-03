@@ -139,7 +139,13 @@ test function!
 
 `source`命令在当前shell中执行脚本，而`exec`命令在新的shell中运行。
 
+### whereis命令：
 
+通过whereis cmake可以找到cmake命令储存的路径。
+
+通过whereis 可以找到shell命令的路径。
+
+### 使用env命令可以显示所有的环境变量
 
 
 
