@@ -111,6 +111,67 @@
 	
 	```
 
+## git branch:
+
+*参考链接：*
+
+[(14条消息) git切换到指定远程分支_git 切换到远程分支_astonishqft的博客-CSDN博客](https://blog.csdn.net/astonishqft/article/details/83029490)
+
+[Git 分支管理 | 菜鸟教程 (runoob.com)](https://www.runoob.com/git/git-branch.html)
+
+### branch查看：
+
+```shell
+git branch #列出所有本地branch
+git branch -a#列出本地branch和remote branch
+```
+
+### 新建branch：
+
+```shell
+git branch branch_name #可以通过git branch 在本地直接新建branch
+git checkout -b branch_name
+#新建远程branch并且切换到指定分支
+git checkout -b 本地branch_name origin/远程branch
+```
+
+
+
+### 删除branch
+
+```shell
+git branch -d branch_name
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
