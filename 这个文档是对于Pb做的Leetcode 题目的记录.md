@@ -2030,6 +2030,124 @@ public:
 
 
 
+## 二进制：
+
+## 题目类型
+
+### 题号: Minimum Operation to Form Subsequence With Target Sum 日期:2023.8.27
+
+> ***网址：https://leetcode.cn/problems/minimum-operations-to-form-subsequence-with-target-sum/description/***
+>
+> **难度：**hard
+>
+> **思想概括：**这道题是昨天周赛中的第三题，本来以为是medium，今天发现是hard。确实是一道算法比较难得题目。昨天周赛的时候我想到了使用二进制的表示来简化分析，但是最后还是发现了有点问题。今天看了别人的解析和证明写完了代码。
+>
+> **数据结构和算法：**
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+  	//这个函数其实没有用到，我在自己实现的时候打算使用这个函数和vector(30,0);来记录nums在2的不同次数上有无数字。
+    int log_two(int num){
+        int result=0;
+        num = num/2;
+        while(num){
+            result++;
+            num = num/2;
+        }
+        return result;
+    }
+    int minOperations(vector<int>& nums, int target) {
+        int result = 0;
+        long sum = 0;
+        for(int i=0;i<nums.size();i++){
+            sum+=nums[i];
+        }
+        if(sum<target){
+            return -1;
+        }
+        sort(nums.begin(),nums.end());//从小到大排序（这样方便之后的pre_add方法）
+        long pre_add = 0;
+        int ind = 0;
+        //思路是将target进行一位位二进制分解，如果那一位为1，就需要有那个数。
+        //我一开始以为都是通过后面的数字进行分解（也就是将8分解成2*4），但是4可以由1 1 2组成。
+        //所以pre_add就是由之前的数字来合成target分解的数字。
+        //有一个分享证明了，小于的数字之和超过target分解的数字，就可以合成这个数字。（这样写的基础！）
+        //我们优先从小的里面减去target的分解值，如果减不了，就通过分解。
+        for(int i=0;i<31;i++){
+            int current_num = 1<<i;
+            while(ind<nums.size() && nums[ind]<=current_num){
+                pre_add+=nums[ind];
+                cout<< "add:"<< nums[ind] <<endl;
+                ind++;
+            }//对于nums中的数字进行add
+            if(target>>i & 1){//一位一位 如果这一位是1，就要进行小的组成或者大的分解操作。
+                //通过一位位右移的方法来判断，这比我自己本来写的使用vector记录要好。
+                if(pre_add >= current_num){//如果小的能减
+                    pre_add -=current_num;
+                    continue;
+                } 
+                //得找后面
+                else{//小的不能减，从后面找
+                    cout<< current_num <<"find!" <<endl;
+                    if(nums[ind]<current_num) ind++;
+                    pre_add+=nums[ind];
+                    int cal = nums[ind];
+                    while(cal>current_num){//这是计算2的幂的方法。例如32右移两位变成8，就是差2的两次方（分解次数）
+                        cal = cal>>1;
+                        result++;
+                    }
+                    pre_add -=current_num;
+                    ind++;
+                } 
+            }
+        }
+        return result;
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 这题还是很开心我在周赛的时间内能做出百分之八十。但是我写的确实不如这种方法，这种左移右移，通过位运算的方式在二进制中还是很有优势的。
+* 这道题也算是锻炼了二进制的一些理解。关于二的倍数的题目都可以尝试下二进制解法。
+* 通过整理下()和{}。
+
+```text
+（）是用在构造函数上的：
+  例如：
+```
+
+```c++
+vector<int> num(30,0);//这里意思就是（）使用构造函数，vector为30个元素，初始值都是0；
+vector<int> num = {1，2，3}；//用来初始化。
+```
+
+```text
+()的本质是在调用函数，所以使用构造函数用（）；
+{}用于直接初始化对象：
+```
+
+```c++
+int num = {42}; // 初始化整数变量为 42
+int arr[] = {1, 2, 3}; // 初始化整数数组
+std::vector<int> vec = {10, 20, 30}; // 初始化整数向量
+//也可以创建临时对象。
+int sum = Foo({1, 2, 3}).calculateSum(); // 创建匿名对象并调用成员函数
+```
+
+
+
+#### 难点回顾:sagittarius:
+
+```text
+这道题就是比较难想。然后二进制的写题较少，不是很熟练吧。但是写完了还是不错滴。
+```
+
+
+
 
 
 
