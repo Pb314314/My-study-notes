@@ -602,6 +602,61 @@ public:
 
 
 
+### [823. Binary Trees With Factors](https://leetcode.cn/problems/binary-trees-with-factors/)日期:2023.8.28
+
+> **难度：medium**
+>
+> **思想概括：**这个题目完全是自己想出来的，收到了两数之和的启发，然后也想到了大的树的子树记录下来进行动态规划。使用unordered_map进行hashing和下标的对应。
+>
+> **数据结构和算法：**树，下边对应的vector，unordered_map
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+    static const int MOD = 1000000007;
+    int numFactoredBinaryTrees(vector<int>& arr) {
+        if(arr.size() ==0) return 0;
+        if(arr.size() ==1) return 1;
+        sort(arr.begin(),arr.end());
+        vector<long> cnt(arr.size(),1);//用来记录子树的个数,一个数至少能有一个树 init=1
+        unordered_map<int,int> num_ind;//{array_number, index in the array}
+        //对于第一个数 只有一棵树
+        num_ind.insert({arr[0],0});
+        long result = cnt[0];//包含了第一个数的树
+        for(int i=1;i<arr.size();i++){
+            //计算arr[i]的子树
+            for(int j=0;j<i;j++){
+                if(arr[i]%arr[j] == 0 && num_ind.find(arr[i]/arr[j]) != num_ind.end()){
+                    //能由别的数字组成树
+                    //cout<< "find" <<endl;
+                    cnt[i] += cnt[j]*cnt[num_ind[arr[i]/arr[j]]];
+                }
+            }
+            num_ind.insert({arr[i],i});
+            result += cnt[i];
+        }
+        return result%MOD;
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 子树可以使用乘法进行计算。
+* 简单的动态规划，记录小的数字的子树，用小的数字子树来计算大的数字的子树。
+
+#### 难点回顾:sagittarius:
+
+```text
+不算太难，但是自己做出来还是很不错的！！能自己想到相关的做法，hashing，DP的使用，很不错。
+```
+
+
+
+
+
 
 
 
@@ -1109,7 +1164,122 @@ public:
 
 
 
+### 题号: [Serialize and Deserialize BST](https://leetcode.cn/problems/serialize-and-deserialize-bst/)  日期:  2023/9/3
 
+> ***网址：***https://leetcode.cn/problems/serialize-and-deserialize-bst/description/?envType=daily-question&envId=2023-09-04
+>
+> **难度：**Medium
+>
+> **思想概括：**这个道题不难，但是今天可能比较浮躁，有思路了想一下子做完，结果反而一直出小错误。这道题就是将BST结构变成string，再通过string还原一个BST。不难，我写的通过递归的方式也不难，但是运行的效率不高。
+>
+> **数据结构和算法：**树，vector，树的还原
+
+#### ==代码实现== :happy:
+
+```c++
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        string result = "";
+        recur_serial(root,result);
+        //cout<< result <<endl;
+        return result;
+    }
+    void recur_serial(TreeNode* root, string &result){
+        if(root){
+            result+=to_string(root->val)+" ";
+            recur_serial(root->left,result);
+            recur_serial(root->right,result);
+        } 
+        return;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        if(data.empty()) return NULL;
+        //cout << "Desearialize!" << data << endl;
+        vector<int> nums;
+        int num;
+        istringstream iss(data);
+        while(iss >> num){
+            nums.push_back(num);
+        }
+        return recue_deserialize(nums, 0, nums.size()-1);
+    }
+    TreeNode* recue_deserialize(vector<int> nums, int start, int end){
+        if(nums.empty() || start>end) return NULL;
+        TreeNode* node = new TreeNode(nums[start]);
+        int index;
+        for( int i= start+1;i<=end;i++){//在找右子树下标
+            if(nums[i] >= nums[start]){
+                index = i;
+                break;
+            }
+        }
+        node->left = recue_deserialize(nums, start+1, index-1);
+        node->right = recue_deserialize(nums, index, end);
+        return node;
+    }
+};
+
+```
+
+```c++
+//这个是chatgpt写的，写得比较好。
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        ostringstream oss;
+        recur_serial(root, oss);
+        return oss.str();
+    }
+
+    void recur_serial(TreeNode* root, ostringstream& oss) {
+        if (root) {
+            oss << root->val << ' ';
+            recur_serial(root->left, oss);
+            recur_serial(root->right, oss);
+        } else {
+            oss << "null ";
+        }
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        if (data.empty()) return nullptr;
+        istringstream iss(data);
+        return recue_deserialize(iss);
+    }
+
+    TreeNode* recue_deserialize(istringstream& iss) {
+        string token;
+        iss >> token;
+        if (token == "null") return nullptr;
+        int val = stoi(token);
+        TreeNode* node = new TreeNode(val);
+        node->left = recue_deserialize(iss);
+        node->right = recue_deserialize(iss);
+        return node;
+    }
+};
+```
+
+
+
+#### 知识点整理:up:
+
+* 我的写法有点复杂，不够好，chatgpt写得好。。
+* 这里还用到了istringstream。这个可以将string转化为数据流，能够使用<<来读取数据流。
+
+#### 难点回顾:sagittarius:
+
+```text
+我的写法来做，是不难的。第二种写法，在读BST的时候加入了null，还愿的时候就利用null来return nullptr，比较好。
+```
 
 
 
@@ -2244,6 +2414,51 @@ int aint = (int) a-48;//-48把ASCII转化成数字
 
 ```text
 主要是不知道格雷码。还有掌握了char和int的转化。
+```
+
+
+
+### [2834. Find the Minimum Possible Sum of a Beautiful Array](https://leetcode.cn/problems/find-the-minimum-possible-sum-of-a-beautiful-array/) 2023.8.26
+
+> **难度：medium**
+>
+> **思想概括：**从小到大枚举，然后将坏的，不能用的num放进set里面。一个个尝试，直到n个全部找到。
+>
+> **数据结构和算法：**hashing。
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+    long long minimumPossibleSum(int n, int target) {
+        long result=0;
+        unordered_set<int> bad_num;
+        int try_num = 1;
+        while(n>0){
+            if(bad_num.find(try_num) == bad_num.end()){
+                //找不到
+                //cout<< try_num<<endl;
+                result = result+ try_num;
+                bad_num.insert(target-try_num);
+                n--;
+            }
+            try_num++;
+        }
+        return result;
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 这个题是我第一次打周赛遇到的题目，不太难，自己就做出来了。
+* 就是使用unordered_set储存坏的数，用来后面快速查找。
+
+#### 难点回顾:sagittarius:
+
+```text
+不太难，自己做出来的周赛第二题，还是记录一下。
 ```
 
 
