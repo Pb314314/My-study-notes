@@ -605,6 +605,27 @@ int main(){
 
 
 
+### c++中的print中的\
+
+这个是c++中正确的print方法。
+
+\可以在引号里面打印引号。
+
+两个\才是\。
+
+```c++
+int main(){
+	cout<<"My name is:Bo Pang " <<endl;
+	cout<<"This (\") is a double quote."   <<endl;
+	cout<< "This (') is a single quote."  <<endl;
+	cout<< "This (\\) is a backslash."    <<endl;
+	cout<< "This (/) is a forward slash"  <<endl;
+	return 0;
+}
+```
+
+
+
 
 
 
