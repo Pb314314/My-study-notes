@@ -626,9 +626,18 @@ int main(){
 
 
 
+### delete 一个array需要delete[] ptr;
 
+```c++
+int* myArray = new int[5]; // Allocate an array of 5 integers on the heap
 
+// Use the dynamically allocated array...
 
+delete[] myArray; // Deallocate the dynamically allocated array
+
+```
+
+如果delet myArray，只会delete一个元素。
 
 
 

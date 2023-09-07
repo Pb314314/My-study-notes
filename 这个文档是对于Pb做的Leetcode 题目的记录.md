@@ -1283,6 +1283,71 @@ public:
 
 
 
+### 题号:[Lowest Common Ancestor of Deepest Leaves](https://leetcode.cn/problems/lowest-common-ancestor-of-deepest-leaves/)日期: 2023/9/6
+
+> ***网址：***https://leetcode.cn/problems/lowest-common-ancestor-of-deepest-leaves/
+>
+> **难度：**medium
+>
+> **思想概括：**这道题做的我烦死了。傻逼玩意儿。关于common ancestor的题目都要考虑左右子树的深度，不要傻傻地硬做啦。
+>
+> **数据结构和算法：**，DFS。
+
+#### ==代码实现== :happy:
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* result;
+    int depth = -1;
+    TreeNode* lcaDeepestLeaves(TreeNode* root) {
+        return dfs(root).second;
+    }
+    pair<int,TreeNode*> dfs(TreeNode* ptr){
+        if(ptr == nullptr) return {0, nullptr};
+        auto [left, left_ptr]= dfs(ptr->left);
+        auto [right, right_ptr] = dfs(ptr->right);
+        if(left == right){
+            //cout<< left <<endl;
+            //是潜在的result
+            int current = left+1;
+            return {current, ptr};
+        }
+        else if(left<right){
+            return {right+1, right_ptr};
+        }
+        else{
+            return {left+1, left_ptr};    
+        }
+    }
+};
+
+```
+
+#### 知识点整理:up:
+
+* 这里面的auto [left, left_ptr]这个用法倒是很好，需要return一组的时候，使用pair作为return值，就不用在那里纠结既要深度，又要指针了。
+* 还是不是很了解这种递归，会不会是我dfs理解比较烂啊。晕倒了要。
+
+#### 难点回顾:sagittarius:
+
+```text
+就是写这个递归，先写最终return条件，然后通过return回去的点拿到的值写前面的点的return条件，不要乱。这种common ancestor的题目，就是比较左右子树的深度，哪一边深就在哪，一样深就是自己。
+```
+
+
+
 
 
 ## 链表
@@ -1600,6 +1665,67 @@ vector<vector<int> > v2(m, vector<int>(n, 0));//二维vector 初始化大小和�
 使用vector<vector<bool>>来进行二维数组的传参。
 要熟记vector的大小和数值的初始化。
 ```
+
+## 查找：
+
+### 题号: 修车的最少时间 日期: 2023/9/7
+
+> ***网址：***https://leetcode.cn/problems/minimum-time-to-repair-cars/solutions/2425409/xiu-che-de-zui-shao-shi-jian-by-leetcode-if20/
+>
+> **难度：** medium
+>
+> **思想概括：**这道题我写的方法很直白，使用DP计算，复杂度很高，过不了。结果看了解答，感觉很巧妙，使用二分查找，来找一个数学的边界，之前没遇到过。题解里写：若解的值域范围内有单调性，就可以使用二分。
+>
+> **数据结构和算法：** 二分查找
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+    long long repairCars(vector<int>& ranks, int cars) {
+        //2*rank - 1
+        long long smaller = 1;
+        long long bigger = (long long)ranks[0]*cars*cars;
+        while(smaller <= bigger){
+            long long time = (smaller+bigger)/2;
+            cout<< time <<endl;
+            long long count = count_cars(time, ranks);
+            if(count>=cars) bigger = time-1;//all right times are valid
+            // count < cars, all valid value are bigger than current left
+            else smaller = time+1; 
+        }
+        // 如果bigger<smaller，smaller就是最小值
+        // 如果bigger == smaller循环就不会出来，所以出来的时候，smaller == bigger+1
+        return smaller;
+
+    }
+    long long count_cars(long long time, vector<int> ranks){
+        long long count = 0;
+        for(int i:ranks){
+            count+=sqrt(time/i);
+        }
+        return count;
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 使用二分查找来找有单调性且有范围的题解。
+  * 对于二分查找的理解。我一直不太清楚smaller<bigger和smaller<=bigger的区别。如果smaller<bigger,在他们指向同一个目标的时候就会跳出循环，就还需要判断这个目标是否满足要求。如果smaller<=bigger，那么跳出循环的时候一定是smaller>bigger因为无论这个指向的目标是否符合，要么smaller+1，要么bigger-1，总会跳出循环。
+  * 对于return smaller还是bigger+1。 对于这道题这两个是一样的，跳出循环的唯一条件就是smaller>bigger。然后可以分析，所有大于bigger的解都是符合要求的，所有小于smaller的解都是不符合要求的。所以上下界一夹，需要return bigger+1。
+
+
+#### 难点回顾:sagittarius:
+
+```text
+对于二分查找的理解。
+```
+
+
+
+
 
 
 
