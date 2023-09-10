@@ -1725,6 +1725,59 @@ public:
 
 
 
+## 贪心
+
+### 题号:[Course Schedule III](https://leetcode.cn/problems/course-schedule-iii/)日期: 2023/9/10
+
+> ***网址：***https://leetcode.cn/problems/course-schedule-iii/description/
+>
+> **难度：**Hard :<
+>
+> **思想概括：**使用贪心算法，最大堆。
+>
+> **数据结构和算法：**堆，lambda，贪心算法。
+
+#### ==代码实现== :happy:
+
+```c++
+class Solution {
+public:
+    int scheduleCourse(vector<vector<int>>& courses) {
+        /*bool lambda = [](vector<int>& a, vector<int>& b){
+            return a[1]<b[1];//希望ddl小的放前面
+        };*/
+        sort(courses.begin(), courses.end(), [](vector<int>& a, vector<int>& b){
+            return a[1]<b[1];//希望ddl小的放前面
+        });
+        priority_queue<int> Que;
+        int total_time = 0;
+        for(int i=0;i<courses.size();i++){
+            int duration = courses[i][0];
+            int ddl = courses[i][1];
+            Que.push(duration);
+            total_time += duration;
+            if(total_time > ddl){
+                total_time -= Que.top();
+                Que.pop();
+            }
+        }
+        return Que.size();
+    }
+};
+```
+
+#### 知识点整理:up:
+
+* 这道题我基本学会了lambda的使用，这里不整理lambda。关于lambda写在c++有趣知识点整理里面。
+* 以及sort函数的comparator。
+* 贪心算法，还是很巧妙的，就看完觉得算法很对，但是不知道怎么表达为什么对。
+
+#### 难点回顾:sagittarius:
+
+```text
+感觉将sort和lambda彻底理解了。还是很有收获的。
+```
+
 
 
 

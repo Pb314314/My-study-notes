@@ -641,6 +641,148 @@ delete[] myArray; // Deallocate the dynamically allocated array
 
 
 
+### Lambda函数：
+
+这几次做leetcode经常碰到lambda函数，之前感觉这个可学可不学，只是简单了了解了语法。今天想着语法也大致懂了，不如真正学一下。
+
+```c++
+Lambda 函数主体：
+[捕获列表](参数列表) -> 返回类型 {
+    // Lambda函数的主体
+    return 表达式;
+}
+```
+
+以下是Lambda函数的主要部分：
+
+- `[捕获列表]`：可选部分，用于指定Lambda函数需要捕获的外部变量。如果Lambda函数不需要访问外部变量，则捕获列表可以为空。捕获列表允许Lambda函数访问其所在作用域中的变量。
+- `(参数列表)`：Lambda函数的参数列表，类似于普通函数的参数列表。可以为空，也可以包含一个或多个参数。
+- `-> 返回类型`：可选部分，用于指定Lambda函数的返回类型。如果Lambda函数可以自动推断返回类型，则可以省略此部分。
+- `{}`：Lambda函数的主体，包含实际的函数逻辑。
+- `return 表达式;`：Lambda函数的返回语句，用于指定Lambda函数的返回值。
+
+Lambda函数通常用于那些只需要在一个地方定义并使用一次的小型函数，它们的语法相对简洁。上面提供的Lambda函数示例是一个典型的Lambda函数，它不需要捕获外部变量，接受两个整数指针作为参数，并返回一个`bool`值。
+
+Lambda函数的语法允许你以更紧凑的方式定义函数，特别是在函数作为参数传递给STL算法或函数对象时非常有用。Lambda函数可以在需要时内联定义，并且无需为其分配独立的函数名。
+
+例子：
+
+```c++
+[](vector<int>& v1, vector<int>& v2) {
+    return v1[1] < v2[1];
+}
+
+sort(courses.begin(), courses.end(),[](vector<int>& v1, vector<int>& v2){
+            return v1[1]<v2[1];
+        });
+//这里通过lambda作为sort的Comparator传递给std::sort(比较函数需要能接受iterator(前两个参数)的传参)
+```
+
+这里的lambda没有捕获列表！ 于是我问chatgpt，能不能使用捕获列表，捕获当前函数中的参数，就不用传参数了，是可以的，只需要[&]就可以捕获定义范围内所有参数（包括栈上和堆上）。
+
+我就有一个疑惑？难道使用[&]，需要将所有参数都放在栈上，然后调用函数？那栈不是爆炸了。
+
+```assembly
+main:
+    ; 函数调用前的准备工作
+    push ebp        ; 保存旧的基址指针到栈上
+    mov ebp, esp    ; 设置新的基址指针
+    sub esp, 8      ; 在栈上为两个整数参数分配空间
+
+    ; 为函数参数赋值
+    mov dword [ebp - 4], 10  ; 第一个参数 a = 10
+    mov dword [ebp - 8], 20  ; 第二个参数 b = 20
+
+    ; 调用 add 函数
+    call add
+
+# esp是栈顶 ebp是栈底
+#将像x86中需要记录旧的指针，然后移动栈顶esp然后push参数在栈上。 那如果将所有捕获都push在stack上，很夸张。
+```
+
+有这个疑问，我向chatgpt追问。他告诉我：
+
+**如果lambda函数没有捕获列表：**
+
+那他就是一个正常的函数，将参数列表的参数push到栈上，进行调用。
+
+**如果lambda函数有捕获列表：**
+
+那这个lambda函数依赖于类存在（这个类的名称通常是一个自动生成的唯一名称，因此你无法在代码中直接引用它。Lambda函数对象在Lambda函数被定义时被创建，并且可以像函数一样被调用）。也就是一个对象函数。这就说得通了。
+
+```text
+当你定义Lambda函数并使用捕获列表时，编译器会生成一个类，该类包含了Lambda函数的实现和捕获的变量作为其成员。然后，Lambda函数的对象（实例）会在运行时创建，这个对象包括了Lambda函数实现所需的所有信息，包括捕获的变量。
+```
+
+然后lambda的函数对象重载了()，可以在函数中被调用。
+
+```c++
+#include <iostream>
+
+int main() {
+    // Lambda函数对象，重载了operator()，可以模拟不同的函数调用行为
+    auto custom_function = [](int x) {
+        return x * 2;
+    };
+
+    // 调用Lambda函数对象，使用不同的参数
+    int result1 = custom_function(5);
+    int result2 = custom_function(10);
+
+    std::cout << "Result 1: " << result1 << std::endl;
+    std::cout << "Result 2: " << result2 << std::endl;
+
+    return 0;
+}
+
+```
+
+
+
+这样算是明白了lambda函数的使用。
+
+lambda没有捕获时，不依赖class存在，可以生成lambda函数对象。（也类似于类中的static，不依赖类对象存在）
+
+lambda有捕获时，依赖class（编译器生成）存在，这个匿名class中包含了被捕获的内容，lambda函数是这个匿名类的匿名方法。
+
+Lambda函数对象是这个匿名类的唯一实例，它可以被调用，就好像是一个普通的函数一样！
+
+所以，Lambda函数对象实际上是指代了生成的匿名类的实例。当您调用Lambda函数对象时，实际上是在调用这个匿名类中的成员函数，这个成员函数就是Lambda函数的实现，它可以访问捕获的外部变量。
+
+Lambda函数对象在使用时就像函数一样，但它们是匿名的，并且在编译时由编译器生成，这使得它们非常方便用于各种编程场景，特别是在需要捕获外部变量的情况下。
+
+理解了捏。
+
+对了 lambda后面要加;。
+
+lambda 函数的实例对象不能作为函数指针，可以转换，但我感觉还是直接在要用函数指针的地方直接写lambda。直接写lambd结尾不用加;。
+
+
+
+### 写完了lambda顺便写一下sort函数
+
+sort函数前两个变量用的很多，就是iterator。.begin()和.end().
+
+最后一个参数是比较器，，std::sort()会调用这个比较器，需要能接受iterator指向的类型。
+
+呃呃，这些我之前就知道，但是经常忘记comparator怎么写：
+
+comparator需要return bool类型。
+
+传入的两个参数，如果return是true就不用换位置，如果return是false就要换位置！！
+
+所以return，就写不用交换的情况。
+
+比如希望从小到大：
+
+```c++
+bool compare(int a, int b){
+  return a<b;//前一个元素小于后一个元素 是希望的。
+}
+```
+
+
+
 
 
 
