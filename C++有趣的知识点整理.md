@@ -1,3 +1,5 @@
+
+
 # 这个文档是C++有趣的知识点整理
 
 [toc]
@@ -605,7 +607,9 @@ int main(){
 
 
 
-### c++中的print中的\
+
+
+## C++中的print中的\
 
 这个是c++中正确的print方法。
 
@@ -626,7 +630,7 @@ int main(){
 
 
 
-### delete 一个array需要delete[] ptr;
+## delete 一个array需要delete[] ptr;
 
 ```c++
 int* myArray = new int[5]; // Allocate an array of 5 integers on the heap
@@ -639,9 +643,7 @@ delete[] myArray; // Deallocate the dynamically allocated array
 
 如果delet myArray，只会delete一个元素。
 
-
-
-### Lambda函数：
+## Lambda 函数
 
 这几次做leetcode经常碰到lambda函数，之前感觉这个可学可不学，只是简单了了解了语法。今天想着语法也大致懂了，不如真正学一下。
 
@@ -757,9 +759,7 @@ Lambda函数对象在使用时就像函数一样，但它们是匿名的，并�
 
 lambda 函数的实例对象不能作为函数指针，可以转换，但我感觉还是直接在要用函数指针的地方直接写lambda。直接写lambd结尾不用加;。
 
-
-
-### 写完了lambda顺便写一下sort函数
+## 写完lambda顺便写一下sort函数
 
 sort函数前两个变量用的很多，就是iterator。.begin()和.end().
 
@@ -783,11 +783,252 @@ bool compare(int a, int b){
 
 
 
+## lvalue和rlvalue
+
+最近接触到C++中的move semantics,想学习一下
+
+简单理解：
+
+lvalue: 有储存的值;
+
+rvalue: temporary value;
+
+- `int&` 是一个对非常量整数的引用，因此它只能绑定到可修改的左值（lvalue）。这意味着它只能引用可以被修改的整数对象，并且不能引用临时对象或常量。
+- `const int&` 是一个对常量整数的引用，因此它可以绑定到左值和右值。它可以引用任何整数对象，无论是可修改的还是常量的，还可以引用临时对象。这使得它更加通用，可以在更多的上下文中使用，包括传递给函数或绑定到表达式的结果。
+- Int&&只绑定rvalue;（移动构造）move semantics
+
+总之，`const int&` 更加灵活，可以引用更多类型的整数对象，而 `int&` 只能引用可修改的左值整数。
+
+```c++
+void PrintName1(std::string& name){//only accept lvalue
+  std::cout<< name <<std::endl;
+}
+
+void PrintName2(const std::string& name){//accept lvalue和rvalue
+  std::cout<< name <<std::endl;
+}
+
+void PrintName3(std::string&& name){// only accept rvalue
+  std::coutM<< name <<std::endl;
+}
+int main(){
+  std::string FirstName = "Bo";
+  std::string LastName = "Pang";
+  std::string Name = FirstName+LastName;
+  PrintName1(Name);//可以
+  PrintName1(FirstName+LastName);//不可以 don't accept rvalue
+  
+}
+```
 
 
 
+## 移动构造：
+
+我终于理解了。。 移动构造中，将指针类数据类型。
+
+对于类类型对象，移动构造函数通常会将指向堆上数据的指针从原始对象转移到新对象，同时对于非指针成员变量，会执行常规的移动或复制操作，具体取决于成员变量的类型。例如，长度信息可以通过常规的赋值操作进行复制，而不需要特殊处理。
+
+总之，移动构造函数的目标是高效地转移资源的所有权，而不是实际的数据复制。这有助于提高性能，尤其是在处理大量数据时。
+
+很好理解：
+
+对于一个vector数组，他有自己的成员变量，比如数组指针，比如int来记录长度。然后数组指针指向的内容是在heap里。
+
+（所以利用vector等传参，只要将vector的成员变量push在stack上，并不麻烦）
+
+一般的拷贝构造会将原本vector的heap中的数据完全复制一个新的。
+
+而移动构造会将指向堆上数据的指针从原始对象转移到新对象，同时对于非指针成员变量，会执行常规的移动或复制操作，具体取决于成员变量的类型。（也就是节省了堆上的数据的复制时间）
+
+这意味着新的 vector 现在拥有原始 vector 中==相同的数据==，而原始 vector 中的指针会被置为空（nullptr），以==避免在其销毁时重复释放内存==。
+
+vector的数组是动态分配的(Dynamic allocation)，也就是CS225中实现的类似hash的Dynamic Allocation。在不够的时候申请一个两倍的内存，然后将数据拷贝过去（时间开销蛮大的），使用空间占比很少的时候shrink。
+
+move是将lvalue转化为rvalue reference,然后就可以使用
+
+```c++
+MyString str2(std::move(str1));
+```
+
+这样的移动构造。
+
+```c++
+#include <iostream>
+
+class MyString {
+public:
+    // 移动构造函数没使用move
+    MyString(MyString&& other) noexcept : data(other.data) {
+        other.data = nullptr; // 将原对象置为空指针，避免资源被释放多次
+    }
+
+    // 构造函数
+    MyString(const char* str) {
+        size = strlen(str);
+        data = new char[size + 1];
+        strcpy(data, str);
+    }
+
+    ~MyString() {
+        delete[] data;
+    }
+
+private:
+    char* data;
+    size_t size;
+};
+
+int main() {
+    MyString str1("Hello, World!");
+
+    // 使用移动构造函数将str1的资源移动到str2
+    MyString str2(std::move(str1));
+
+    // 此时str1不再拥有资源，data为nullptr
+    std::cout << "str1: " << (str1.data == nullptr ? "nullptr" : str1.data) << std::endl;
+
+    // str2仍然拥有资源
+    std::cout << "str2: " << (str2.data == nullptr ? "nullptr" : str2.data) << std::endl;
+
+    return 0;
+}
+
+```
 
 
+
+```c++
+#include <iostream>
+#include <utility>
+
+class MyString {
+public:
+    MyString(char* str) {
+        size = strlen(str);
+        data = new char[size + 1];
+        strcpy(data, str);
+    }
+
+    // 移动构造函数
+    MyString(MyString&& other) noexcept : data(other.data), size(other.size) {
+        // 将其他对象置为空状态
+        other.data = nullptr;
+        other.size = 0;
+    }
+
+    ~MyString() {
+        delete[] data;
+    }
+
+private:
+    char* data;
+    size_t size;
+};
+
+int main() {
+    char hello[] = "Hello, World!";
+    
+    // 创建 MyString 对象
+    MyString str1(hello);
+
+    // 使用移动构造函数将 str1 的资源移动到 str2
+    MyString str2(std::move(str1));
+
+    // 输出结果
+    std::cout << "str1: " << (str1.data == nullptr ? "nullptr" : str1.data) << std::endl;
+    std::cout << "str2: " << (str2.data == nullptr ? "nullptr" : str2.data) << std::endl;
+
+    return 0;
+}
+
+```
+
+
+
+这里调用的是自动生成的移动构造函数:
+
+```c++
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> source = {1, 2, 3, 4, 5};
+    std::vector<int> destination = std::move(source); // 移动构造函数
+
+    // 此时 source 已经不再拥有数据，可以安全地访问 destination
+    for (const auto& value : destination) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+```
+
+这是自己写移动构造函数：
+
+```c++
+#include <iostream>
+#include <utility>
+
+class MyString {
+public:
+    // 移动构造函数
+    MyString(MyString&& other) noexcept : data(std::move(other.data)) {
+        // 将原对象的数据指针置为空
+        other.data = nullptr;
+    }
+
+    // 构造函数
+    MyString(const char* str) {
+        size = strlen(str);
+        data = new char[size + 1];
+        strcpy(data, str);
+    }
+
+    ~MyString() {
+        delete[] data;
+    }
+
+private:
+    char* data;
+    size_t size;
+};
+
+int main() {
+    MyString str1("Hello, World!");
+
+    // 使用移动构造函数将str1的资源移动到str2
+    MyString str2(std::move(str1));
+
+    // 此时str1不再拥有资源，data为nullptr
+    std::cout << "str1: " << (str1.data == nullptr ? "nullptr" : str1.data) << std::endl;
+
+    // str2仍然拥有资源
+    std::cout << "str2: " << (str2.data == nullptr ? "nullptr" : str2.data) << std::endl;
+
+    return 0;
+}
+
+```
+
+关于这个move基本理解了，就是将新的实例使用旧的数据来构造，就不用拷贝了，旧的那个数据指针被设为nullptr，效率较高。
+
+对于int等基本类型，都有默认的移动构造函数。
+
+对于基本数据结构，没有构造函数，只能使用赋值操作符。
+
+```c++
+int a = 2;
+int test = std::move(a);
+//这之后a变成为定义；
+```
+
+
+
+关于lvalue和rvalue还没有完全理解。呃呃 下次再说了。
 
 
 
