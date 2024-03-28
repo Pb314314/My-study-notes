@@ -8,13 +8,13 @@ Exam2 Review
 
 ## Pipeline
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240327233426051.png" alt="image-20240327233426051" style="zoom:33%;" />
+<img src="./pictures/image-20240327233426051.png" alt="image-20240327233426051" style="zoom:33%;" />
 
 Stall: 
 
 #### 1: structural Hazard
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240327234003610.png" alt="image-20240327234003610" style="zoom:33%;" />
+<img src="./pictures/image-20240327234003610.png" alt="image-20240327234003610" style="zoom:33%;" />
 
 当两个指令同时使用MEM的时候。一个在IF，一个在MEM。但是只有一个能用cache，导致stall。
 
@@ -42,7 +42,7 @@ Else, set L = 0, fetch the next instruction. Need to squash if branch is taken.
 
 #### 对于branch prediction的优化方式：
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328004900098.png" alt="image-20240328004900098" style="zoom:33%;" />
+<img src="./pictures/image-20240328004900098.png" alt="image-20240328004900098" style="zoom:33%;" />
 
 这个inst是否是branch？ ： 通过BTB来准确知道？（难道说BTB说是branch，一定是branch，BTB说不是branch，可能是branch。怎么有点像bloom filter？）BTB到底储存PC address还是valid bit?
 
@@ -56,11 +56,11 @@ Else, set L = 0, fetch the next instruction. Need to squash if branch is taken.
 
 但是我们在IF的阶段只知道Branch指令的address。我们尝试利用address来知道branch的target address和是否branch。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240327234339297.png" alt="image-20240327234339297" style="zoom:33%;" />
+<img src="./pictures/image-20240327234339297.png" alt="image-20240327234339297" style="zoom:33%;" />
 
 #### Branch Target Buffer
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240327234723187.png" alt="image-20240327234723187" style="zoom:33%;" />
+<img src="./pictures/image-20240327234723187.png" alt="image-20240327234723187" style="zoom:33%;" />
 
 通过hash[PC]找到BTB中的位置，get the information of this branch.
 
@@ -70,7 +70,7 @@ Else, set L = 0, fetch the next instruction. Need to squash if branch is taken.
 
 #### 对于函数call和return
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240327235451887.png" alt="image-20240327235451887" style="zoom:33%;" />
+<img src="./pictures/image-20240327235451887.png" alt="image-20240327235451887" style="zoom:33%;" />
 
 对于函数调用和函数return的指令。我们希望在函数调用的时候记录下return的address。
 
@@ -80,7 +80,7 @@ Else, set L = 0, fetch the next instruction. Need to squash if branch is taken.
 
 问题？如果没有RAS的时候是怎么return的？如何来获得address？
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328000145102.png" alt="image-20240328000145102" style="zoom:33%;" />
+<img src="./pictures/image-20240328000145102.png" alt="image-20240328000145102" style="zoom:33%;" />
 
 如果有太多的call instruction.一直往RAT中push。那当pop的时候曾经的一些address溢出来。
 
@@ -96,7 +96,7 @@ BTB中的内容：
 
 我其实有个疑惑。因为在IF阶段，我们只知道inst的address。所以我们不知道一个inst是不是branch inst. 用address在BTB中找，得到inst是不是branch。如果不存branch address，如果将一个不是branch的inst预测成branch，不是很蛋疼吗？而且每个inst都要去BTB中找，总觉得效率不高。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328000734664.png" alt="image-20240328000734664" style="zoom:33%;" />
+<img src="./pictures/image-20240328000734664.png" alt="image-20240328000734664" style="zoom:33%;" />
 
 
 
@@ -104,7 +104,7 @@ BTB中的内容：
 
 因为当pipeline很深的时候，branch预测错误后果很严重。而且在程序中，branch的频率很高。这里是branch和CPI的计算。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328003138107.png" alt="image-20240328003138107" style="zoom:33%;" />
+<img src="./pictures/image-20240328003138107.png" alt="image-20240328003138107" style="zoom:33%;" />
 
 
 
@@ -114,7 +114,7 @@ BTB中的内容：
 
 #### Bimodel Predictor
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328010153875.png" alt="image-20240328010153875" style="zoom:33%;" />
+<img src="./pictures/image-20240328010153875.png" alt="image-20240328010153875" style="zoom:33%;" />
 
 提出了4-state machine 的概念（2 bit state machine，2 bit saturating counter）
 
@@ -134,7 +134,7 @@ GHR是一个shift register（左移动），来记录N个最近遇到的branch�
 
 #### G-Select
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328005901843.png" alt="image-20240328005901843" style="zoom:33%;" />
+<img src="./pictures/image-20240328005901843.png" alt="image-20240328005901843" style="zoom:33%;" />
 
 这是一个使用GHR的例子。将PC hash定位到行。用GHR定位到列。通过得到的值来predict。
 
@@ -146,7 +146,7 @@ GHR是一个shift register（左移动），来记录N个最近遇到的branch�
 
 使用PC XOR GHR在table中选择。是对于bimodel的改进。其实G-Select和G-Share都是利用了PC_Addr和GHR的信息，来得到一个branch inst是否taken。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328010647070.png" alt="image-20240328010647070" style="zoom:33%;" />
+<img src="./pictures/image-20240328010647070.png" alt="image-20240328010647070" style="zoom:33%;" />
 
 #### Yel-Patt Predictor
 
@@ -158,7 +158,7 @@ GHR是一个shift register（左移动），来记录N个最近遇到的branch�
 
 如果HT是3bits，那Pattern table就有2**3个entry。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328010959847.png" alt="image-20240328010959847" style="zoom:33%;" />
+<img src="./pictures/image-20240328010959847.png" alt="image-20240328010959847" style="zoom:33%;" />
 
 #### Perceptron Predictor
 
@@ -174,13 +174,13 @@ wi = wi + actual * xi（actual是true or false）
 
 用强化学习的方式来更新不同GHR的bit的w。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328012823515.png" alt="image-20240328012823515" style="zoom:33%;" />
+<img src="./pictures/image-20240328012823515.png" alt="image-20240328012823515" style="zoom:33%;" />
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328013320952.png" alt="image-20240328013320952" style="zoom:33%;" />
+<img src="./pictures/image-20240328013320952.png" alt="image-20240328013320952" style="zoom:33%;" />
 
 #### Hybrid Predictor
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328013302556.png" alt="image-20240328013302556" style="zoom:33%;" />
+<img src="./pictures/image-20240328013302556.png" alt="image-20240328013302556" style="zoom:33%;" />
 
 至此，结束了Branch prediction的内容。
 
@@ -196,7 +196,7 @@ wi = wi + actual * xi（actual是true or false）
 
 要避免RAW stall。一个instruction需要在EX之前拿到reg value。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328022950311.png" alt="image-20240328022950311" style="zoom: 50%;" />
+<img src="./pictures/image-20240328022950311.png" alt="image-20240328022950311" style="zoom: 50%;" />
 
 #### ByPass 1-3
 
@@ -208,13 +208,13 @@ wi = wi + actual * xi（actual是true or false）
 
 **Mem/Wb Bypass3**: Inst在WB阶段，将新的value输入到后面的inst的Decode Mux。（如果Register File支持Write to RF before read就可以不需要这个Bypass）
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328023415938.png" alt="image-20240328023415938" style="zoom:33%;" />
+<img src="./pictures/image-20240328023415938.png" alt="image-20240328023415938" style="zoom:33%;" />
 
 #### Load RAW stall
 
 但是对于Load inst，没有办法避免RAW导致的stall。因为load的数据在MEM之后才能拿到，但是下一个inst需要在EX之前拿到数据。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328024116693.png" alt="image-20240328024116693" style="zoom:33%;" />
+<img src="./pictures/image-20240328024116693.png" alt="image-20240328024116693" style="zoom:33%;" />
 
 #### Superscalar
 
@@ -222,7 +222,7 @@ wi = wi + actual * xi（actual是true or false）
 
 有四种类型： 指令是否按顺序发送，执行指令是否按顺序。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328024423165.png" alt="image-20240328024423165" style="zoom:33%;" />
+<img src="./pictures/image-20240328024423165.png" alt="image-20240328024423165" style="zoom:33%;" />
 
 同时，在现实中，不同的指令需要不同的cycle数。
 
@@ -242,7 +242,7 @@ wi = wi + actual * xi（actual是true or false）
 
 这也是计分牌算法的不足。也引出了Tomasulu算法。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328024846490.png" alt="image-20240328024846490" style="zoom:33%;" />
+<img src="./pictures/image-20240328024846490.png" alt="image-20240328024846490" style="zoom:33%;" />
 
 #### Tomasulo's 算法
 
@@ -261,7 +261,7 @@ broadcast给RF和reservation station中的所有reg对象
 
 有个问题，是只有invalid进行比较吗？match之后tag需要清除吗？
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328030446307.png" alt="image-20240328030446307" style="zoom: 50%;" />
+<img src="./pictures/image-20240328030446307.png" alt="image-20240328030446307" style="zoom: 50%;" />
 
 
 
@@ -273,29 +273,29 @@ broadcast给RF和reservation station中的所有reg对象
 
 我们为什么想要precise exception？
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328031159786.png" alt="image-20240328031159786" style="zoom:33%;" />
+<img src="./pictures/image-20240328031159786.png" alt="image-20240328031159786" style="zoom:33%;" />
 
 #### ROB（保守策略）
 
 ROB是第一种解决方案：
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328031223990.png" alt="image-20240328031223990" style="zoom:33%;" />
+<img src="./pictures/image-20240328031223990.png" alt="image-20240328031223990" style="zoom:33%;" />
 
-![image-20240328031026441](/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328031026441.png)
+![image-20240328031026441](./pictures/image-20240328031026441.png)
 
 但是后面的inst需要reg。reg新的值可能在ROB中，而不是Register file中。所以，要么同时在RF和ROB中找，要么增加ROB Bypass。（都增加了Latency）
 
 第一种方式： Bypass4
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328031423658.png" alt="image-20240328031423658" style="zoom:33%;" />
+<img src="./pictures/image-20240328031423658.png" alt="image-20240328031423658" style="zoom:33%;" />
 
 第二种方式：Indirection（RAT）
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328031510807.png" alt="image-20240328031510807" style="zoom:33%;" />
+<img src="./pictures/image-20240328031510807.png" alt="image-20240328031510807" style="zoom:33%;" />
 
 通过RAT增加了indirection。上面的是额外的register。下面的是read register file。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328031549054.png" alt="image-20240328031549054" style="zoom:33%;" />
+<img src="./pictures/image-20240328031549054.png" alt="image-20240328031549054" style="zoom:33%;" />
 
 #### RAT
 
@@ -305,15 +305,15 @@ indirection的方法。
 
 激进策略
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328031713729.png" alt="image-20240328031713729" style="zoom:33%;" />
+<img src="./pictures/image-20240328031713729.png" alt="image-20240328031713729" style="zoom:33%;" />
 
 #### Future File+ ROB
 
 使用Future File来快速获得reg的value。使用Architectural file当exception的时候恢复reg value。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328121450592.png" alt="image-20240328121450592" style="zoom:33%;" />
+<img src="./pictures/image-20240328121450592.png" alt="image-20240328121450592" style="zoom:33%;" />
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328121544632.png" alt="image-20240328121544632" style="zoom:33%;" />
+<img src="./pictures/image-20240328121544632.png" alt="image-20240328121544632" style="zoom:33%;" />
 
 这个是In-Order Pipeline with Future file and Reorder Buffer.
 
@@ -321,9 +321,9 @@ indirection的方法。
 
 当一个inst 要retire的时候，check是否exception。没有exception： 将value写进Architectural file。如果发生exception，将architectural file的内容写回future file。
 
-<img src="/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328121649561.png" alt="image-20240328121649561" style="zoom:33%;" />
+<img src="./pictures/image-20240328121649561.png" alt="image-20240328121649561" style="zoom:33%;" />
 
-![image-20240328121933379](/Users/pb/Documents/My-study-notes/2024Spring/pictures/image-20240328121933379.png)****
+![image-20240328121933379](./pictures/image-20240328121933379.png)****
 
 
 
