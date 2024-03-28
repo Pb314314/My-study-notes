@@ -137,11 +137,187 @@ valgrind --leak-check=full ./your_program
 
 像是数据库这种长时间运行的server，一定要避免内存泄漏问题，不然自己的运行空间会被heap一直扩大而压缩，从而导致效率下降。
 
+valgrind --leak-check=full -v ./buffer_manager_test
 
+ctest -V -R buffer_manager_test_valgrind
 
 ### \#pragma once
 
 这个可以避免头文件的反复include，而且比起#ifdefine更加简洁。
+
+
+
+### 关于shared_ptr的内存泄漏
+
+第二个Lab中我全部使用了智能指针进行动态分配。但是测试valgrind的时候还是出现了内存泄漏。后来发现是因为我使用shared_ptr的互相reference的情况。由于我使用了这样的数据结构。
+
+```c++
+class Linked_BufferFrame{
+    public:
+        Linked_BufferFrame(shared_ptr<BufferFrame>& page_ptr);
+        shared_ptr<BufferFrame> page_ptr;   // current page;
+        shared_ptr<Linked_BufferFrame> next;  // point to the next page;
+        shared_ptr<Linked_BufferFrame> prev;  // point to the prev page;
+};
+```
+
+可以看到，双向链表中前后指针互相reference，指向同一个内存。这就导致在程序结束的时候，动态分配的内存都有大于0的reference。所以导致内存没有自动清除。
+
+解决：
+
+```c++
+// Deallocator of BufferManager
+BufferManager::~BufferManager() {
+    // Write back all pages inside buffer;
+    hash_table.clear();
+    shared_ptr<Linked_BufferFrame> ptr = fifo_head;
+    shared_ptr<Linked_BufferFrame> temp;
+    while(ptr){
+        write_back_page(ptr);
+        temp = ptr;
+        ptr = ptr->next;
+        if(temp->next)temp->next.reset();
+        if(temp->prev) temp->prev.reset();
+        if(temp) temp.reset();
+    }
+    ptr= lru_head;
+    while(ptr){
+        write_back_page(ptr);
+        temp = ptr;
+        ptr = ptr->next;
+        if(temp->next)temp->next.reset();
+        if(temp->prev) temp->prev.reset();
+        if(temp) temp.reset();
+    }
+}
+```
+
+在析构函数中，我将reference的shared_ptr进行reset(). 当指向一个内存地址的所有shared_ptr都reset()时，这个内存会被自动删除。就不会内存泄漏了。
+
+
+
+### 关于**Abstract class** 和 **Base Class** 和 Virtual函数。
+
+Base class可以直接创建实例，Abstract class不能直接创建实例。
+
+例子：
+
+**Abstract class:**
+
+```c++
+#include <iostream>
+class Animal {
+public:
+    Animal(const std::string& name) : name(name) {}
+
+    void eat() {
+        std::cout << name << " is eating." << std::endl;
+    }
+
+    virtual void makeSound() {
+        std::cout << name << " makes a sound." << std::endl;
+    }
+
+private:
+    std::string name;
+};
+
+class Dog : public Animal {
+public:
+    Dog(const std::string& name) : Animal(name) {}
+
+    void makeSound() override {
+        std::cout << "Woof! Woof!" << std::endl;
+    }
+};
+
+int main() {
+    Dog myDog("Buddy");
+    myDog.eat();
+    myDog.makeSound(); // Calls the overridden makeSound method
+
+    return 0;
+}
+
+```
+
+**Abstract class:**
+
+```c++
+#include <iostream>
+
+class Shape {
+public:
+    virtual double area() const = 0; // Pure virtual function
+};
+
+class Circle : public Shape {
+private:
+    double radius;
+
+public:
+    Circle(double r) : radius(r) {}
+
+    double area() const override {
+        return 3.14159 * radius * radius;
+    }
+};
+
+int main() {
+    // Shape shape; // Error: Cannot create an instance of an abstract class
+
+    Circle circle(5);
+    std::cout << "Circle area: " << circle.area() << std::endl;
+
+    return 0;
+}
+
+```
+
+可以看到，abstract class中至少含有一个pure virtual function. 这个pure virtual function必须要在abstract function 的子类中实现。
+
+#### Pure Virtual Function and Virtual Function
+
+Both Pure Virtual Function and Virtual Function can be overridden by the derived class.
+
+Difference:
+
+**Pure Virtual Function:** 
+
+* derived class must implement this function.
+* the origin class does not provide any implementation. It essentially says, "Derived classes must provide their own implementation for this function; I don't have one
+
+**Virtual Function:** 
+
+* Derived class can decide whether overridden this function.
+
+* A virtual function in the base class can have a default implementation. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

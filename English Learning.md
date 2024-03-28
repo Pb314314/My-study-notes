@@ -60,6 +60,12 @@ What are you doing out here? 你为什么在外面玩？ 你怎么在这儿？
 
 What are you doing over here?
 
+You gotta stop being so naive.
+
+Don't be so naive.
+
+
+
 
 
 
