@@ -1013,10 +1013,11 @@ struct MyStruct {
 
 
 
-
 最近在学kuiperinfer，看代码看到了关于单例模式，涉及到static在这之中的运用，记录一下。原来static这么复杂......
 
-### Static Variables Inside Functions
+### Static变量
+
+#### Static Variables Inside Functions
 
 Static variables declared within functions maintain their value between function calls but are only accessible within that function. Each static variable inside a function is unique to that function’s scope:
 
@@ -1040,7 +1041,7 @@ int main() {
 }
 ```
 
-### Static Variables at Global Scope or in Classes
+#### Static Variables at Global Scope or in Classes
 
 When declared outside of all functions (global scope) or as static members of classes, static variables have broader visibility and a single instance across the program or all instances of the class:
 
@@ -1087,7 +1088,7 @@ int main() {
 }
 ```
 
-### Uniqueness
+#### Uniqueness
 
 - **Function Scope Statics**: Unique within the function they are declared in.
 - **Global Scope Statics and Static Class Members**: Unique in the context of the entire program or class. They provide a single instance accessible from various parts of the program or any instance of the class.
@@ -1095,3 +1096,22 @@ int main() {
 In summary, whether static variables are considered "globally unique" depends on their scope of declaration. Static variables within functions are unique to those functions. Those at the global scope or as part of classes are unique in a broader sense, applicable across the entire program or all instances of a class, respectively.
 
 所以static在类中，可以实现线程安全的单例模式。
+
+类中的static变量只在这个变量第一次使用的时候initialize。
+
+### static的initialization和储存位置
+
+global static variables are initialized only once. The initialization occurs before the program starts executing the main function and after all dynamic memory allocations are made. This initialization guarantees that the variable is ready to use by the time the program begins execution, and it persists for the lifetime of the application.
+
+Global static variables, local static variables within functions, and static class members all share a common trait: they are initialized only once and maintain their values for the lifetime of the program. Here’s a brief overview:
+
+1. **Storage**: All types of static variables are stored in the Data Segment of the program's memory. This includes both initialized (.data section) and uninitialized (.bss section) static variables.
+2. **Initialization**:
+   - **Global Static Variables and Static Class Members** are initialized before the program’s `main()` function begins execution. This ensures they are ready to use throughout the program.
+   - **Local Static Variables** are initialized the first time their function is called, and their initialization only occurs once.
+3. **Visibility**:
+   - **Global Static Variables** are accessible throughout the file in which they are declared but are confined to their translation unit unless marked with `extern`.
+   - **Local Static Variables** are only visible within the function that declares them, yet they retain their values between calls to that function.
+   - **Static Class Members** are accessible from any instance of the class or directly via the class itself, depending on their access specifiers.
+
+Each type of static variable plays a critical role in managing state and behavior in software applications, providing persistent storage and controlled access across different parts of a program.
