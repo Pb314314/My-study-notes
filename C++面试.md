@@ -53,7 +53,7 @@ typedef struct __attribute__((packed)) table_entry {
 
 ⚠️每一个process有自己的TLB，在context switch的时候需要flush TLB。
 
-⚠️TLB中也包括kernel space中虚拟地址向物理地址的转换，但是由于不同process具有相同的内核空间映射，所以TLB中内核空间的映射在context switch的时候保持不变。（TLB flush只是将user space的映射关系flush）（这也是kernel space在每个process中位置相同的好处）
+⚠️TLB中也包括kernel space中虚拟地址向物理地址的转换，但是由于不同process具有相同的内核空间映射，所有TLB中内核空间的映射在context switch的时候保持不变。（TLB flush只是将user space的映射关系flush）（这也是kernel space在每个process中位置相同的好处）
 
 #### page在内存中
 
@@ -83,7 +83,7 @@ typedef struct __attribute__((packed)) table_entry {
 
 #### Process请求读取文件（访问内存等硬件资源）
 
-- Process请求打开并读取一个文件。比如：应用程序调用操作系统提供的文件读取API，如在C语言中使用`fread()`函数。、
+- Process请求打开并读取一个文件。比如：应用程序调用操作系统提供的文件读取API，如在C语言中使用`fread()`函数。
 
 #### 系统调用
 
@@ -1011,5 +1011,87 @@ struct MyStruct {
 
 2. **避免冲突**：`extern`本身并不是为了避免全局变量冲突而设计的，它的目的是为了提供一种方式来在不同的文件之间共享变量或函数。
 
-   
 
+
+
+最近在学kuiperinfer，看代码看到了关于单例模式，涉及到static在这之中的运用，记录一下。原来static这么复杂......
+
+### Static Variables Inside Functions
+
+Static variables declared within functions maintain their value between function calls but are only accessible within that function. Each static variable inside a function is unique to that function’s scope:
+
+- **Persistence**: They are initialized only once and retain their state between function calls.
+- **Visibility**: They are only visible within the function, not outside of it.
+
+**Example**:
+
+```c++
+cppCopy code
+void count() {
+    static int counter = 0;  // Only initialized once
+    counter++;
+    std::cout << "Counter: " << counter << std::endl;
+}
+
+int main() {
+    count();  // Prints "Counter: 1"
+    count();  // Prints "Counter: 2"
+    // 'counter' is not accessible here, only within 'count'
+}
+```
+
+### Static Variables at Global Scope or in Classes
+
+When declared outside of all functions (global scope) or as static members of classes, static variables have broader visibility and a single instance across the program or all instances of the class:
+
+所以是不是可以这样理解：
+
+全局的static变量是全局唯一的（没有static的全局变量也是全局唯一的）
+
+（区别是static全局变量只在declare的文件可见。global variable可以被any别的文件访问，使用 external）。
+
+```c++
+// File: main.cpp
+int globalVar = 10; // Accessible from other files if declared with extern
+
+// File: another.cpp
+extern int globalVar;
+
+void printGlobalVar() {
+    std::cout << "Global Var: " << globalVar << std::endl;
+}
+```
+
+
+
+类成员中的static变量：在这个类的所有实例中都共用一个。因为static变量只会initialize一次，并且是线程安全的。
+
+- **Global Static Variables**: They are initialized once and accessible from any part of the program that includes their declaration, making them unique across the entire program.
+- **Static Class Members**: These are shared across all instances of a class, meaning there is only one copy for the entire class, regardless of how many instances are created.
+
+**Example**:
+
+```c++
+cppCopy code
+static int globalCounter = 0;  // Global static variable, accessible globally where declared
+
+class Example {
+    static int count;  // Static member variable, one per class, not per instance
+};
+
+int Example::count = 0;
+
+int main() {
+    globalCounter++;
+    Example::count++;
+}
+```
+
+### Uniqueness
+
+- **Function Scope Statics**: Unique within the function they are declared in.
+- **Global Scope Statics and Static Class Members**: Unique in the context of the entire program or class. They provide a single instance accessible from various parts of the program or any instance of the class.
+
+In summary, whether static variables are considered "globally unique" depends on their scope of declaration. Static variables within functions are unique to those functions. Those at the global scope or as part of classes are unique in a broader sense, applicable across the entire program or all instances of a class, respectively.
+
+所以static在类中，可以实现线程安全的单例模式。
