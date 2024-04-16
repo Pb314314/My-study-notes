@@ -1115,3 +1115,60 @@ Global static variables, local static variables within functions, and static cla
    - **Static Class Members** are accessible from any instance of the class or directly via the class itself, depending on their access specifiers.
 
 Each type of static variable plays a critical role in managing state and behavior in software applications, providing persistent storage and controlled access across different parts of a program.
+
+
+
+这个帖子讲了关于全局变量，全局静态变量，类静态成员变量的初始化。
+
+https://www.cnblogs.com/dylan-liang/p/14407237.html
+
+
+
+局部静态变量空间分配在程序运行之前。但是初始化在第一次使用的时候。
+
+1. **Allocation**: The memory for a local static variable is allocated when the program starts, similar to global variables. This is part of the program's static storage allocation. Even though the memory is allocated, the variable isn't constructed yet.
+2. **Initialization**: The initialization of a local static variable occurs the first time control passes through its declaration. This is known as "lazy initialization" because the variable is not initialized until it's needed.
+
+例子：
+
+```C++
+void myFunction() {
+    static int myStaticVar = computeValue(); // computeValue() is called only the first time myFunction() is called
+}
+int main() {
+    myFunction(); // myStaticVar is initialized here
+    myFunction(); // myStaticVar is not re-initialized; it retains its value
+    return 0;
+}
+```
+
+
+Yes, that's correct—local static variables have a unique behavior:
+
+1. **Allocation**: The memory for a local static variable is allocated when the program starts, similar to global variables. This is part of the program's static storage allocation. Even though the memory is allocated, the variable isn't constructed yet.
+2. **Initialization**: The initialization of a local static variable occurs the first time control passes through its declaration. This is known as "lazy initialization" because the variable is not initialized until it's needed.
+
+Here's an example to illustrate this:
+
+```
+cppCopy code
+void myFunction() {
+    static int myStaticVar = computeValue(); // computeValue() is called only the first time myFunction() is called
+}
+
+int main() {
+    myFunction(); // myStaticVar is initialized here
+    myFunction(); // myStaticVar is not re-initialized; it retains its value
+    return 0;
+}
+```
+
+In the example above, `myStaticVar` is only initialized during the first call to `myFunction()`. Subsequent calls to `myFunction()` do not re-initialize `myStaticVar`; it retains its value between calls. Even though `myFunction()` could be called multiple times, `computeValue()` will only be invoked once to initialize `myStaticVar`.
+
+The first-time initialization ensures that:
+
+- The variable is initialized in a thread-safe way (since C++11).
+- The variable is only initialized if the function is actually called, avoiding unnecessary work if the function is never used.
+
+
+
